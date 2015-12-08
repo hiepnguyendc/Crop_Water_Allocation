@@ -84,7 +84,6 @@
         if (bstatus == 0) then
             tot_prob_crop = 0.00
 	        do r = 1,tree(itr)%dec(dpts)%season(cur_sea)%max_opt_crop
-                
                 if ((ant(n_ant)%tree(itr)%season(cur_sea)%max_status(r) == 0).AND.&
                         (ant(n_ant)%tree(itr)%season(cur_sea)%min_status(r) == 0).AND.&
                         (seasons(cur_sea)%bsea(r) == 0).AND.&
@@ -102,6 +101,8 @@
 	            do r = 1,tree(itr)%dec(dpts)%season(cur_sea)%max_opt_crop
 		            tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(r)%prob=&
                         tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(r)%prob/tot_prob_crop
+		            !prob_crop=tree(itr)%dec(dpts)%crop(l)%opt_water(r)%prob
+!                    print *, r, tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(r)%prob
                 end do
             end if
         else    ! bstatus == 1
