@@ -17,7 +17,8 @@
    integer :: num_it,num_ant		!current number of iterations and ants
    INTEGER :: itr,dpts,count_dur	!current decision tree and decision point
    integer :: cur_sea               !current season
-
+ 
+   if(aco_type==1) call selection_standard(num_ant,itr,dpts,count_dur,cur_sea)
    iF(aco_type==5) CALL selection_standard(num_ant,itr,dpts,count_dur,cur_sea)
  
  end subroutine path_selection
@@ -26,12 +27,13 @@
  
  subroutine selection_standard(num_ant,itr,dpts,count_dur,cur_sea)
  
- ! Aaron Zecchin, April 2002 modified Joanna Szemis, October 2010, modified by Duc Cong Hiep Nguyen, February 2014
+ ! Aaron Zecchin, April 2002 modified Joanna Szemis, October 2010, modified by Duc Cong Hiep Nguyen, October 2012
  ! determines path that num_ant is to take
  
 	use ant_graph
 	use ant_colony
 	use r_num
+    use qsort_c_module
     use water_model
    
 	real(8) :: sum_prob_crop, sum_prob_water, wuse
@@ -71,7 +73,8 @@
 	    ! This occurs only if ant(num_ant)%random(i) = 1.0
 	    if(flag == 0) then
             ant(num_ant)%tree(itr)%season(cur_sea)%dec_crop(dpts) = tree(itr)%dec(dpts)%season(cur_sea)%max_opt_crop
-        end if            
+        end if
+        
         if (seasons(cur_sea)%name_crop(ant(num_ant)%tree(itr)%season(cur_sea)%dec_crop(dpts)) /= "dryland") then
             ant(num_ant)%sea_cur_area(cur_sea) = ant(num_ant)%sea_cur_area(cur_sea) + array_areas(dpts)
         end if
@@ -81,5 +84,5 @@
             
         if (seasons(cur_sea)%ws_sea(j) == 3) bstatus = 1
     end if ! bstatus == 1
-
+   
 end subroutine selection_standard
