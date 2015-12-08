@@ -170,7 +170,7 @@ END SUBROUTINE SA_open_files_MMAS
     WRITE(25,*)'No. of iterations = ', max_it
     WRITE(25,*)'Initial Pheromone = ', tau_0
     WRITE(25,*)
-    
+
     IF(aco_type == 5) CALL summary_MMAS_SA
 
     WRITE(25,*)'Problem formulation data;'
