@@ -7,7 +7,7 @@
 
 SUBROUTINE SA_collect_run_data(num_sa, num_rand)
 
-	! Aaron Zecchin, July 2002
+	! Aaron Zecchin, July 2002, modified by Duc Cong Hiep Nguyen, February 2014
 	! Transfers the ACO solutions stored in store type and transfers them to the point type
 	! INPUT: num_sa, num_rand, ant_store[store(1)%cost, store(1)%pen_cost, store(1)%evaluation_num,
 	! store(1)%val, store(1)%decision(all)]
