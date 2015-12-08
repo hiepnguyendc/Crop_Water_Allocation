@@ -19,6 +19,9 @@
     INTEGER :: dum = 1						!Passed into print_prob as this variable location is only used for ACS
     integer :: cur_sea                      !current season
 
+! Determining aco type, note ACS (type 2) is not called as the probability distribution of the ACS changes locally
+
+    if(aco_type==1) call prob_AS(itr,n_ant,dpts,count_dur,cur_sea)
     IF(aco_type==5) CALL prob_MMAS(itr,n_ant,dpts,count_dur,cur_sea)
 
    end subroutine prob_determination
@@ -58,7 +61,7 @@
  
    subroutine prob_standard_crop(alpha,beta,itr,n_ant,dpts,count_dur,cur_sea)
 
-! Aaron Zecchin, April 2002, modified by Joanna Szemis, October 2010, modified by Duc Cong Hiep Nguyen, February 2014
+! Aaron Zecchin, April 2002, modified by Joanna Szemis, October 2010, modified by Duc Cong Hiep Nguyen, October 2012
 ! Determines the probability distribution using generic ACO weighting function
 ! INPUT: alpha, beta, ant-graph[ max_path, path(i)%max_edge, path(i)%edge(j)%eta, path(i)%edge(j)%tau ]
 ! OUTPUT: ant_graph[ path(i)%edge(j)%prob ]
@@ -80,7 +83,7 @@
         !preliminary weighting/probability calculations
         if (bstatus == 0) then
             tot_prob_crop = 0.00
-	        do r = 1,tree(itr)%dec(dpts)%season(cur_sea)%max_opt_crop
+	        do r = 1,tree(itr)%dec(dpts)%season(cur_sea)%max_opt_crop                
                 if ((ant(n_ant)%tree(itr)%season(cur_sea)%max_status(r) == 0).AND.&
                         (ant(n_ant)%tree(itr)%season(cur_sea)%min_status(r) == 0).AND.&
                         (seasons(cur_sea)%bsea(r) == 0).AND.&
@@ -93,7 +96,6 @@
                     tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(r)%prob = 0.0
                 end if
             end do
-
             ! Actual prob calculations
             if (tot_prob_crop > 0) then
 	            do r = 1,tree(itr)%dec(dpts)%season(cur_sea)%max_opt_crop
