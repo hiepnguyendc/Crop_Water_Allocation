@@ -11,6 +11,7 @@ Four ACO variants include:
 
 4. ACO-DDVO-VF: an ACO algorithm that uses the Nguyen et al. (2016) DDVO adjustment and incorporates domain knowledge through the use of VFs.
 
+
 References
 
 Kumar, R. & Khepar, S.D., 1980. Decision models for optimal cropping patterns in irrigations based on crop water production functions. Agricultural Water Management, 3 (1), 65-76.
