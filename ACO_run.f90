@@ -38,11 +38,13 @@
                     bstatus = 0
                     wbstatus = 0
                     do p = 1, n_sea
+                        call heuristic_crop(n_it,n_ant,i,q,1,p)
 					    call prob_determination(n_it,aco_type,i,n_ant,q,1,p)	! sets probabilities for ant loop
 					    ! there are two ways to determine probabilities for ant loop. here is the first one. the second one
 					    ! will calculate for the whole decision tree, meaning this subroutine will be run before this loop.
 					    call path_selection(n_it,n_ant,i,q,1,p)				    ! calling path selection subroutine                  
                         if (seasons(p)%name_crop(ant(n_ant)%tree(i)%season(p)%dec_crop(q)) /= "dryland") then
+                            call heuristic_wuse(n_it,n_ant,i,q,1,p)
                             call prob_determination_wateruse(n_it,aco_type,i,n_ant,q,1,p)
                             call path_selection_wateruse(n_it,n_ant,i,q,1,p)                            
                         end if
@@ -53,6 +55,6 @@
 		end do
 		call global_routines(n_it)  
 	end do
-  
+       
 211 FORMAT(2x, I3, 2x, I3, 2x, I3, 2x, I3)
  end subroutine
