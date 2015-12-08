@@ -159,6 +159,7 @@ END SUBROUTINE print_SA_random_loop_results
 SUBROUTINE print_SA_detailed_random_loop_results
 
 	! Aaron Zecchin, April 2002
+    ! modified by Duc Cong Hiep Nguyen, February 2014
 	! Prints out combinations (path selections) for each ant stored in the sa type
 	! INPUT:
 	! OUTPUT:
