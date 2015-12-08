@@ -19,6 +19,8 @@
     INTEGER :: dum = 1						!Passed into print_prob as this variable location is only used for ACS
     integer :: cur_sea                      !current season
 
+! Determining aco type, note ACS (type 2) is not called as the probability distribution of the ACS changes locally
+
     if(aco_type==1) call prob_AS(itr,n_ant,dpts,count_dur,cur_sea)
     IF(aco_type==5) CALL prob_MMAS(itr,n_ant,dpts,count_dur,cur_sea)
 
