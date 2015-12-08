@@ -49,7 +49,7 @@
 
     integer::n_ant,dpts,itr,count_dur		!number of current ants, decision points and tree
     integer :: cur_sea               !current season
-
+    
     CALL prob_standard_wateruse(alpha,beta,itr,n_ant,dpts,count_dur,cur_sea)
 
     END SUBROUTINE prob_MMAS_wateruse
@@ -58,8 +58,7 @@
  
 subroutine prob_standard_wateruse(alpha,beta,itr,n_ant,dpts,count_dur,cur_sea)
 
-! Aaron Zecchin, April 2002, modified by Joanna Szemis, October 2010
-! modified by Duc Cong Hiep Nguyen, February 2014
+! Aaron Zecchin, April 2002, modified by Joanna Szemis, October 2010, modified by Duc Cong Hiep Nguyen, February 2014
 ! Determines the probability distribution using generic ACO weighting function
 ! INPUT: alpha, beta, ant-graph[ max_path, path(i)%max_edge, path(i)%edge(j)%eta, path(i)%edge(j)%tau ]
 ! OUTPUT: ant_graph[ path(i)%edge(j)%prob ]
@@ -79,16 +78,29 @@ subroutine prob_standard_wateruse(alpha,beta,itr,n_ant,dpts,count_dur,cur_sea)
     real(8) :: y, tvar
 
 !first two loops to calculate the decision points to choose the water amounts for crops
-    do i = 1, n_crop(cur_sea)
-        cur_crop = i
-        if (seasons(cur_sea)%name_crop(cur_crop) /= "dryland") then
-		    !preliminary weighting/probability calculations 
-		    tot_prob_water = 0.00				
+    cur_crop = ant(n_ant)%tree(itr)%season(cur_sea)%dec_crop(dpts)
+    if (seasons(cur_sea)%wuse_crop(cur_crop) == 0.0) then
+        if (wbstatus == 0) then
+            tot_prob_water = 0.00				
 		    do r = 1,tree(itr)%dec(dpts)%season(cur_sea)%crop(cur_crop)%max_opt_water
-			    tree(itr)%dec(dpts)%season(cur_sea)%crop(cur_crop)%opt_water(r)%prob=&
-                    tree(itr)%dec(dpts)%season(cur_sea)%crop(cur_crop)%opt_water(r)%tau**alpha &
-				    *tree(itr)%dec(dpts)%season(cur_sea)%crop(cur_crop)%opt_water(r)%heu**beta
-			    tot_prob_water=tot_prob_water+tree(itr)%dec(dpts)%season(cur_sea)%crop(cur_crop)%opt_water(r)%prob
+                if (ant(n_ant)%tree(itr)%season(cur_sea)%crop(cur_crop)%dec_water_status(r) == 0) then
+                    y = tree(itr)%dec(dpts)%season(cur_sea)%crop(cur_crop)%opt_water(r)%property
+                        tvar = (seasons(cur_sea)%aa(cur_crop,1)*seasons(cur_sea)%aa(cur_crop,2) + &
+                            seasons(cur_sea)%bb(cur_crop,1)*seasons(cur_sea)%bb(cur_crop,2)*y + &
+                            seasons(cur_sea)%cc(cur_crop,1)*seasons(cur_sea)%cc(cur_crop,2)&
+                            *(y**seasons(cur_sea)%cc(cur_crop,3)))*seasons(cur_sea)%pcrop(cur_crop)-&
+                            (seasons(cur_sea)%pcost(cur_crop)+pwater*y)
+                        if (tvar > 0) then
+			                tree(itr)%dec(dpts)%season(cur_sea)%crop(cur_crop)%opt_water(r)%prob=&
+                                tree(itr)%dec(dpts)%season(cur_sea)%crop(cur_crop)%opt_water(r)%tau**alpha &
+				                *tree(itr)%dec(dpts)%season(cur_sea)%crop(cur_crop)%opt_water(r)%heu**beta
+			                tot_prob_water=tot_prob_water+tree(itr)%dec(dpts)%season(cur_sea)%crop(cur_crop)%opt_water(r)%prob
+                        else
+                            tree(itr)%dec(dpts)%season(cur_sea)%crop(cur_crop)%opt_water(r)%prob = 0.0
+                        end if
+                else  !if (ant(n_ant)%tree(itr)%season(cur_sea)%crop(cur_crop)%dec_water_status(r) /= 0)
+                    tree(itr)%dec(dpts)%season(cur_sea)%crop(cur_crop)%opt_water(r)%prob = 0.0
+                end if !if (ant(n_ant)%tree(itr)%season(cur_sea)%crop(cur_crop)%dec_water_status(r) == 0)
 		    end do
 
 		    ! Actual prob calculations
@@ -98,8 +110,10 @@ subroutine prob_standard_wateruse(alpha,beta,itr,n_ant,dpts,count_dur,cur_sea)
                         tree(itr)%dec(dpts)%season(cur_sea)%crop(cur_crop)%opt_water(r)%prob/tot_prob_water
                 end do
             end if
+        else    !if (wbstatus == 1)
+            tree(itr)%dec(dpts)%season(cur_sea)%crop(cur_crop)%opt_water(:)%prob = 0.0
         end if
-    end do
+    end if !seasons(cur_sea)%wuse_crop(cur_crop) == 0.0
 
 211 FORMAT(2x, I3, 2x, I3, 2x, I3, 2x, I3)
 
