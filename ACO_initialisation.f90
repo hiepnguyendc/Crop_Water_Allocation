@@ -86,6 +86,7 @@ subroutine ACO_initialisation
     end do
 
 	! Initialising appropriate ACO type parameters (reading in second line)
+	if(aco_type == 1) call initialise_AS
 	if(aco_type == 5) call initialise_MMAS   
 
 end subroutine ACO_initialisation
@@ -203,9 +204,9 @@ subroutine initialise_ant_graph
                     tree(i)%dec(j)%season(k)%crop(l)%max_opt_water = seasons(k)%n_opt_water(l)
 				    do r=1,seasons(k)%n_opt_water(l)
 					    if (tree(i)%dec(j)%season(k)%crop(l)%opt_water(r)%cost < small_val) then	!Checking to see if cost is equal to zero
-						    tree(i)%dec(j)%season(k)%crop(l)%opt_water(r)%heu = 1.0         		!if so then a virtual cost is used to determine visability
-					    else																    	!if not the actual option cost is used
-						    tree(i)%dec(j)%season(k)%crop(l)%opt_water(r)%heu = 1.0 	
+						    tree(i)%dec(j)%season(k)%crop(l)%opt_water(r)%heu = 1.0 !/ zero_cost		!if so then a virtual cost is used to determine visability
+					    else																	!if not the actual option cost is used
+						    tree(i)%dec(j)%season(k)%crop(l)%opt_water(r)%heu = 1.0 !- 1.0 /tree(i)%dec(j)%crop(l)%opt_water(r)%cost	
 					    end if
                     end do
                 end do
@@ -227,6 +228,7 @@ subroutine initialise_AS
 	read(44,*) beta
 	read(44,*) rho
 	read(44,*) q
+!    print *, alpha,beta,rho,q
    
 end subroutine initialise_AS
 !:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -278,6 +280,7 @@ subroutine cost_details
 	USE water_model
 	USE ACO_input
 	USE ant_graph
+    use qsort_c_module
   
 	integer :: i,j,k,l,r,h
 	CHARACTER(5) ::dummy 
@@ -348,7 +351,6 @@ subroutine cost_details
                             seasons(k)%aa(l,2) + seasons(k)%bb(l,1)*seasons(k)%bb(l,2)*x(l) + &
                             seasons(k)%cc(l,1)*seasons(k)%cc(l,2)*(x(l)**seasons(k)%cc(l,3)))*&
                             seasons(k)%pcrop(l)-(seasons(k)%pcost(l)+pwater*x(l))
-
                         seasons(k)%n_opt_water(l) = 150
                         interval(l) = wcap
                         allocate(y(seasons(k)%n_opt_water(l)))
