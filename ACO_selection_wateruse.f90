@@ -9,7 +9,6 @@
  subroutine path_selection_wateruse(num_it,num_ant,itr,dpts,count_dur,cur_sea)
  
 ! Aaron Zecchin, April 2002
-! Duc Cong Hiep Nguyen, February 2014
 ! calls further subroutines (dependant on aco type) to determine the path that ant "num_ant" is to take
  
    use ant_colony
@@ -27,7 +26,7 @@
  
  subroutine selection_standard_wateruse(num_ant,itr,dpts,count_dur,cur_sea)
  
- ! Duc Cong Hiep Nguyen, February 2014
+ ! Aaron Zecchin, April 2002 modified Joanna Szemis, October 2010, modified by Duc Cong Hiep Nguyen, February 2014
  ! determines path that num_ant is to take
  
 	use ant_graph
@@ -40,6 +39,7 @@
 	integer :: num_ant,itr,dpts,count_dur
     integer :: cur_sea, cur_crop              !current season, current crop
 	real(8) :: sum_area, sum_used_area, water_rest,water_avai
+    real(8) :: ran_num
       
     !  selection of edges
     !*************** SELECTION - CROPS *************************
@@ -59,10 +59,14 @@
                     ant(num_ant)%tree(itr)%season(cur_sea)%crop(cur_crop)%dec_water(dpts) = j
 		        end if
             end do
+    
 	        ! This occurs only if ant(num_ant)%random(i) = 1.0
 	        if(flag == 0) then
-                tree(itr)%dec(dpts)%season(cur_sea)%crop(cur_crop)%max_opt_water = &
-                    ant(num_ant)%tree(itr)%season(cur_sea)%crop(cur_crop)%dec_water(dpts)
+                j = tree(itr)%dec(dpts)%season(cur_sea)%crop(cur_crop)%max_opt_water
+                do while ((tree(itr)%dec(dpts)%season(cur_sea)%crop(cur_crop)%opt_water(j)%prob == 0).AND.(j > 1))
+                    j = j - 1
+                end do
+                ant(num_ant)%tree(itr)%season(cur_sea)%crop(cur_crop)%dec_water(dpts) = j
             end if
             !update the option of water use for this crop
             seasons(cur_sea)%wuse_crop(cur_crop) = ant(num_ant)%tree(itr)%season(cur_sea)%crop(cur_crop)%dec_water(dpts)
@@ -80,7 +84,7 @@
                 end if
             end do
         end if
-    else
+    else    !if (seasons(cur_sea)%wuse_crop(cur_crop) /= 0.0) 
         ant(num_ant)%tree(itr)%season(cur_sea)%crop(cur_crop)%dec_water(dpts) = seasons(cur_sea)%wuse_crop(cur_crop)
         !update accumulated water for the current ant
         if (wbstatus == 0) then 
