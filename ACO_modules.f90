@@ -14,6 +14,8 @@ module ACO_input
    
 	INTEGER :: seed_ran_1, seed_ran_2, seed_ran_3 ! random number generator seed val
 	INTEGER :: seed_ran_4, seed_ran_5
+    integer, allocatable, dimension(:) :: max_it_array
+    integer :: n_max_it
  
 end module ACO_input
 
@@ -311,3 +313,83 @@ MODULE water_model
 END MODULE
 !::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
    
+! Recursive Fortran 95 quicksort routine sorts real numbers into ascending numerical order
+! Author: Juli Rew, SCD Consulting (juliana@ucar.edu), 9/03
+! Based on algorithm from Cormen et al., Introduction to Algorithms, 1997 printing
+! Made F conformant by Walt Brainerd
+
+module qsort_c_module
+
+	public :: QsortC
+	private :: Partition
+
+	contains
+		recursive subroutine QsortC(A,B)
+			real(8), intent(in out), dimension(:) :: A,B
+			integer :: iq,n
+
+			if (size(A) > 1) then
+				call Partition(A, B, iq)
+				call QsortC(A(:iq-1),B(:iq-1))
+				call QsortC(A(iq:),B(iq:))
+			end if
+		end subroutine QsortC
+
+		subroutine Partition(A, B, marker)
+			real(8), intent(in out), dimension(:) :: A,B
+			integer, intent(out) :: marker
+			integer :: i, j, n
+			real(8) :: temp
+			real(8) :: x      ! pivot point
+			x = A(1)
+			i= 0
+			j= size(A) + 1
+			do
+				j = j-1
+				do
+					if (A(j) <= x) exit
+					j = j-1
+				end do
+				i = i+1
+				do
+					if (A(i) >= x) exit
+					i = i+1
+				end do
+				if (i < j) then
+					! exchange A(i) and A(j)
+					temp = A(i)
+					A(i) = A(j)
+					A(j) = temp
+                    temp = B(i)
+					B(i) = B(j)
+					B(j) = temp
+				elseif (i == j) then
+					marker = i+1
+					return
+				else
+					marker = i
+					return
+				end if
+			end do
+		end subroutine Partition
+end module qsort_c_module
+    
+!::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    MODULE local_search_variables
+	! Duc Cong Hiep 17 October 2014
+	!"local_search_variables" module contains varibles for a local search
+    
+    type seals_details
+        integer, allocatable, dimension(:,:) :: old, old1, old2, old3, work, new
+    end type seals_details
+
+    type(seals_details), dimension (2) :: sea_ls	!properties of seasons in local search
+    
+    real(8) :: usedwater
+    integer :: old_row, old_col, new_row, new_col
+    real(8) :: NR_working, NR_active
+    integer :: old_location1, old_location2, old_location3, old_location4
+    integer :: itercount_work, itercount_final
+     
+END MODULE
+!::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
