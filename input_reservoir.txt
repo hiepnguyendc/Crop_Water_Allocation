@@ -6,7 +6,7 @@ Resevoir Data
 0.67	Evap parameter c2
 
 Release Data
-111275	   100178	84457.0		Max allocation/year (ML)
+117.0 409.5 585.0 819.0 994.5 1170.0	Max allocation/year (ML)
 2500.0
 1500.0
 1000.0
