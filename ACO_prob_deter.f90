@@ -75,29 +75,36 @@
     integer :: k,l,r,m
     integer :: cur_sea               !current season
     
-    !first two loops to calculate the decision points to choose crops
-    !preliminary weighting/probability calculations
-    if (bstatus == 0) then
-        tot_prob_crop = 0.00
-	    do r = 1,tree(itr)%dec(dpts)%season(cur_sea)%max_opt_crop                
-            if (seasons(cur_sea)%bsea(r) == 0) then
-		        tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(r)%prob=&
-                    tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(r)%tau**alpha &
-			        *tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(r)%heu**beta
-		        tot_prob_crop=tot_prob_crop+tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(r)%prob
-            else
-                tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(r)%prob = 0.0
-            end if
-        end do
-
-        ! Actual prob calculations
-        if (tot_prob_crop > 0) then
+    if (ant(n_ant)%tree(itr)%season(cur_sea)%sea_status == 0) then
+        !first two loops to calculate the decision points to choose crops
+        !preliminary weighting/probability calculations
+        if (bstatus == 0) then
+            tot_prob_crop = 0.00
 	        do r = 1,tree(itr)%dec(dpts)%season(cur_sea)%max_opt_crop
-		        tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(r)%prob=&
-                    tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(r)%prob/tot_prob_crop
+                if ((ant(n_ant)%tree(itr)%season(cur_sea)%max_status(r) == 0).AND.&
+                        (ant(n_ant)%tree(itr)%season(cur_sea)%min_status(r) == 0).AND.&
+                        (seasons(cur_sea)%bsea(r) == 0).AND.&
+                        (ant(n_ant)%tree(itr)%season(cur_sea)%crop(r)%water_status == 0)) then
+		            tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(r)%prob=&
+                        tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(r)%tau**alpha &
+			            *tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(r)%heu**beta
+		            tot_prob_crop=tot_prob_crop+tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(r)%prob
+                else
+                    tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(r)%prob = 0.0
+                end if
             end do
+
+            ! Actual prob calculations
+            if (tot_prob_crop > 0) then
+	            do r = 1,tree(itr)%dec(dpts)%season(cur_sea)%max_opt_crop
+		            tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(r)%prob=&
+                        tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(r)%prob/tot_prob_crop
+                end do
+            end if
+        else    ! bstatus == 1
+            tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(:)%prob = 0.0
         end if
-    else    ! bstatus == 1
+    else    ! ant(n_ant)%tree(itr)%season(cur_sea)%sea_status == 1
         tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(:)%prob = 0.0
     end if
 
