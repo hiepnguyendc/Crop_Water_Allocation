@@ -1,8 +1,6 @@
 !:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 subroutine check_penalties(num_ant)
 
-! Duc Cong Hiep Nguyen, February 2014
-
     use ant_graph
 	use ant_colony
 
@@ -17,8 +15,6 @@ end subroutine check_penalties
 
 !:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 subroutine penalty_sea_max_area(num_ant)
-
-! Duc Cong Hiep Nguyen, February 2014
 
     use ant_graph
 	use ant_colony
@@ -36,9 +32,6 @@ end subroutine penalty_sea_max_area
 !:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 subroutine penalty_crop_maxmin_area(num_ant)
-
-!Duc Cong Hiep Nguyen, February 2014
-
     !check the crops obtaining the maximum values
     
     use ant_graph
@@ -72,9 +65,7 @@ end subroutine penalty_crop_maxmin_area
 !:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 subroutine penalty_wuse(num_ant)
-
-! Duc Cong Hiep Nguyen, February 2014
-
+    
     use ant_graph
 	use ant_colony
     use water_model
