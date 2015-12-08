@@ -38,48 +38,86 @@
 	integer :: flag,j,i,r,q, checkb, m
 	integer :: num_ant,itr,dpts,count_dur,cur_sea
 	real(8) :: sum_area, sum_used_area, water_rest,water_avai
+    real(8) :: ran_num
       
     !  selection of edges
     !*************** SELECTION - CROPS *************************
-    if (bstatus == 1) then
-        ant(num_ant)%sea_cur_area(cur_sea) = ant(num_ant)%sea_cur_area(cur_sea) + array_areas(dpts)
-        j = ant(num_ant)%tree(itr)%season(cur_sea-1)%dec_crop(dpts)
-        do i = 1, n_crop(cur_sea)
-            if (seasons(cur_sea-1)%name_crop(j) == seasons(cur_sea)%name_crop(i)) then
-                ant(num_ant)%tree(itr)%season(cur_sea)%dec_crop(dpts) = i
-                ant(num_ant)%tree(itr)%season(cur_sea)%crop(i)%area_planted(dpts) = array_areas(dpts)
-                ant(num_ant)%tree(itr)%season(cur_sea)%crop(i)%area_accumulated = &
-                    ant(num_ant)%tree(itr)%season(cur_sea)%crop(i)%area_accumulated + array_areas(dpts)
+    !check status of maximum area in each season
+    if (ant(num_ant)%tree(itr)%season(cur_sea)%sea_status == 1) then
+        ant(num_ant)%sea_cur_dryarea(cur_sea) = ant(num_ant)%sea_cur_dryarea(cur_sea) + array_areas(dpts)
+        do r = 1, n_crop(cur_sea)
+            if (seasons(cur_sea)%name_crop(r) == "dryland") then
+                ant(num_ant)%tree(itr)%season(cur_sea)%dec_crop(dpts) = r
+                ant(num_ant)%tree(itr)%season(cur_sea)%crop(r)%area_planted(dpts) = array_areas(dpts)
+                 ant(num_ant)%tree(itr)%season(cur_sea)%crop(r)%area_accumulated = &
+                        ant(num_ant)%tree(itr)%season(cur_sea)%crop(r)%area_accumulated + array_areas(dpts)
             end if
         end do
-        wbstatus = 1
     else
-        flag = 0
-	    sum_prob_crop = 0.00
-	    j = 0
-	    ant(num_ant)%tree(itr)%season(cur_sea)%random_crop(dpts) = grnd()     ! generating random number
-
-	    do while ((flag == 0).AND.(j < tree(itr)%dec(dpts)%season(cur_sea)%max_opt_crop))
-		    j = j + 1
-            sum_prob_crop = sum_prob_crop + tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(j)%prob
-		    if (ant(num_ant)%tree(itr)%season(cur_sea)%random_crop(dpts) <= sum_prob_crop) then
-			    flag = 1
-                ant(num_ant)%tree(itr)%season(cur_sea)%dec_crop(dpts) = j
-		    end if
-        end do
-    
-	    ! This occurs only if ant(num_ant)%random(i) = 1.0
-	    if(flag == 0) then
-            ant(num_ant)%tree(itr)%season(cur_sea)%dec_crop(dpts) = tree(itr)%dec(dpts)%season(cur_sea)%max_opt_crop
-        end if            
-        if (seasons(cur_sea)%name_crop(ant(num_ant)%tree(itr)%season(cur_sea)%dec_crop(dpts)) /= "dryland") then
+        if (bstatus == 1) then
             ant(num_ant)%sea_cur_area(cur_sea) = ant(num_ant)%sea_cur_area(cur_sea) + array_areas(dpts)
-        end if
-        ant(num_ant)%tree(itr)%season(cur_sea)%crop(j)%area_planted(dpts) = array_areas(dpts)
-        ant(num_ant)%tree(itr)%season(cur_sea)%crop(j)%area_accumulated = &
-            ant(num_ant)%tree(itr)%season(cur_sea)%crop(j)%area_accumulated + array_areas(dpts)
+            ant(num_ant)%sea_cur_dryarea(cur_sea) = ant(num_ant)%sea_cur_dryarea(cur_sea) + array_areas(dpts)
+            j = ant(num_ant)%tree(itr)%season(cur_sea-1)%dec_crop(dpts)
+            do i = 1, n_crop(cur_sea)
+                if (seasons(cur_sea-1)%name_crop(j) == seasons(cur_sea)%name_crop(i)) then
+                    ant(num_ant)%tree(itr)%season(cur_sea)%dec_crop(dpts) = i
+                    ant(num_ant)%tree(itr)%season(cur_sea)%crop(i)%area_planted(dpts) = array_areas(dpts)
+                    ant(num_ant)%tree(itr)%season(cur_sea)%crop(i)%area_accumulated = &
+                        ant(num_ant)%tree(itr)%season(cur_sea)%crop(i)%area_accumulated + array_areas(dpts)
+                end if
+            end do
+            wbstatus = 1
+        else
+            flag = 0
+	        sum_prob_crop = 0.00
+	        j = 0
+	        ant(num_ant)%tree(itr)%season(cur_sea)%random_crop(dpts) = grnd()     ! generating random number
+
+	        do while ((flag == 0).AND.(j < tree(itr)%dec(dpts)%season(cur_sea)%max_opt_crop))
+		        j = j + 1
+                sum_prob_crop = sum_prob_crop + tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(j)%prob
+		        if (ant(num_ant)%tree(itr)%season(cur_sea)%random_crop(dpts) <= sum_prob_crop) then
+			        flag = 1
+                    ant(num_ant)%tree(itr)%season(cur_sea)%dec_crop(dpts) = j
+		        end if
+            end do
+    
+	        ! This occurs only if ant(num_ant)%random(i) = 1.0
+	        if(flag == 0) then
+                j = tree(itr)%dec(dpts)%season(cur_sea)%max_opt_crop
+                do while ((tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(j)%prob == 0).AND.(j > 1))
+                    j = j - 1
+                end do
+                if (j > 1) then
+                    ant(num_ant)%tree(itr)%season(cur_sea)%dec_crop(dpts) = j
+                else
+                    do i = 1, n_crop(cur_sea)
+                        if (seasons(cur_sea)%name_crop(i) == "dryland") then
+                            ant(num_ant)%tree(itr)%season(cur_sea)%dec_crop(dpts) = i
+                        end if
+                    end do
+                end if
+            end if
             
-        if (seasons(cur_sea)%ws_sea(j) == 3) bstatus = 1
-    end if ! bstatus == 1
+            if (seasons(cur_sea)%name_crop(ant(num_ant)%tree(itr)%season(cur_sea)%dec_crop(dpts)) /= "dryland") then
+                ant(num_ant)%sea_cur_area(cur_sea) = ant(num_ant)%sea_cur_area(cur_sea) + array_areas(dpts)
+            end if
+                
+            if (seasons(cur_sea)%ws_sea(j) == 3) bstatus = 1
+
+            if (ant(num_ant)%tree(itr)%season(cur_sea)%crop(j)%area_accumulated < seasons(cur_sea)%min_crop_area(j)) then
+                if (sea_min_area(cur_sea) > array_areas(dpts)) then
+                    sea_min_area(cur_sea) = sea_min_area(cur_sea) - array_areas(dpts)
+                else
+                    sea_min_area(cur_sea) = 0
+                end if
+            end if
+            
+            ant(num_ant)%sea_cur_dryarea(cur_sea) = ant(num_ant)%sea_cur_dryarea(cur_sea) + array_areas(dpts)
+                ant(num_ant)%tree(itr)%season(cur_sea)%crop(j)%area_planted(dpts) = array_areas(dpts)
+                ant(num_ant)%tree(itr)%season(cur_sea)%crop(j)%area_accumulated = &
+                    ant(num_ant)%tree(itr)%season(cur_sea)%crop(j)%area_accumulated + array_areas(dpts)
+        end if ! bstatus == 1
+    end if !ant(num_ant)%tree(itr)%season(cur_sea)%sea_status == 1
 
 end subroutine selection_standard
