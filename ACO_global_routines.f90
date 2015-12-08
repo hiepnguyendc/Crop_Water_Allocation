@@ -15,8 +15,7 @@ end subroutine global_routines
  
 SUBROUTINE global_updating_MMAS
 
-	! Aaron Zecchin, April 2002
-    ! modified by Duc Cong Hiep Nguyen, February 2014
+	! Aaron Zecchin, April 2002, modified by Duc Cong Hiep Nguyen, February 2014
 	! Updates pheromone levels according to ASrank
 	! INPUT: ant_colony[ant(l)%decision(j), ant(l)%value1, max_ant], ant_graph[path(i)%edge(j)%tau],
 	! para_asrank[best_i&decision(j), best_i%value1,best_g&decision(j), best_g%value1, roe, pbest, delta, counter_g]
@@ -46,7 +45,7 @@ SUBROUTINE global_updating_MMAS
                     tree(i)%dec(j)%season(p)%opt_crop(r)%tau = tree(i)%dec(j)%season(p)%opt_crop(r)%tau * rho
                 end do
 			    do l = 1, n_crop(p)		
-				    do r = 1, tree(i)%dec(j)%season(p)%crop(l)%max_opt_water	    
+				    do r = 1, tree(i)%dec(j)%season(p)%crop(l)%max_opt_water
 					    tree(i)%dec(j)%season(p)%crop(l)%opt_water(r)%tau = &
                             tree(i)%dec(j)%season(p)%crop(l)%opt_water(r)%tau * rho 
                     end do
@@ -228,7 +227,7 @@ END SUBROUTINE global_updating_MMAS
 
 SUBROUTINE global_store_results(num_it)
 
-	! Aaron Zecchin, April 2002
+	! Aaron Zecchin, April 2002, modified by Duc Cong Hiep Nguyen, February 2014
 	! This subroutines updates and stores the global best results
 	! INPUT: num_it, ant_graph[max_path, path(all)%edge(selected ants)%property], 
 	!      ant_colony[max_ant, ant(all)%val, ant(all)%decision(all)]    
