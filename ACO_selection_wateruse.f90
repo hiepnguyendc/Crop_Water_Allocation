@@ -95,5 +95,5 @@
                 ant(num_ant)%tree(itr)%season(cur_sea)%crop(cur_crop)%dec_water(dpts))%property*array_areas(dpts)
         end if
     end if
-
+    
 end subroutine selection_standard_wateruse
