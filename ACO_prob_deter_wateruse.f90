@@ -52,7 +52,7 @@
 
     integer::n_ant,dpts,itr,count_dur		!number of current ants, decision points and tree
     integer :: cur_sea               !current season
-
+    
     CALL prob_standard_wateruse(alpha,beta,itr,n_ant,dpts,count_dur,cur_sea)
 
     END SUBROUTINE prob_MMAS_wateruse
@@ -81,7 +81,6 @@ subroutine prob_standard_wateruse(alpha,beta,itr,n_ant,dpts,count_dur,cur_sea)
     real(8) :: y, tvar
 
 !first two loops to calculate the decision points to choose the water amounts for crops
-! if (tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(r)%prob == 0.0) ....
     do i = 1, n_crop(cur_sea)
         cur_crop = i
         if (seasons(cur_sea)%name_crop(cur_crop) /= "dryland") then
