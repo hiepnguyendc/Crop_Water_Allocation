@@ -1,10 +1,10 @@
 !:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 !
 ! CONTAINS:
-! SUBROUTINE prob_determination_wateruse(num_it, aco_type,itr,n_ant,dpts)
-! SUBROUTINE prob_AS_wateruse(itr,n_ant,dpts)
-! SUBROUTINE prob_MMAS_wateruse(itr,n_ant,dpts)
-! SUBROUTINE prob_standard_wateruse(alpha, beta,itr,n_ant,dpts)
+! SUBROUTINE prob_determination(num_it, aco_type,itr,n_ant,dpts)
+! SUBROUTINE prob_AS(itr,n_ant,dpts)
+! SUBROUTINE prob_MMAS(itr,n_ant,dpts)
+! SUBROUTINE prob_standard(alpha, beta,itr,n_ant,dpts)
 !
 !::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: 
    
@@ -19,6 +19,9 @@
     INTEGER :: dum = 1						!Passed into print_prob as this variable location is only used for ACS
     integer :: cur_sea                      !current season
 
+! Determining aco type, note ACS (type 2) is not called as the probability distribution of the ACS changes locally
+
+    if(aco_type==1) call prob_AS_wateruse(itr,n_ant,dpts,count_dur,cur_sea)
     IF(aco_type==5) CALL prob_MMAS_wateruse(itr,n_ant,dpts,count_dur,cur_sea)
 
    end subroutine prob_determination_wateruse
@@ -33,7 +36,7 @@
     use para_as
     integer::n_ant,dpts,itr,count_dur		!number of current ants, decision points and tree
     integer :: cur_sea               !current season
-
+    
     CALL prob_standard_wateruse(alpha,beta,itr,n_ant,dpts,count_dur,cur_sea)
 
   end subroutine prob_AS_wateruse
@@ -49,7 +52,8 @@
 
     integer::n_ant,dpts,itr,count_dur		!number of current ants, decision points and tree
     integer :: cur_sea               !current season
-
+    
+!    CALL prob_standard_crop(alpha,beta,itr,n_ant,dpts,count_dur,cur_sea)
     CALL prob_standard_wateruse(alpha,beta,itr,n_ant,dpts,count_dur,cur_sea)
 
     END SUBROUTINE prob_MMAS_wateruse
@@ -58,8 +62,7 @@
  
 subroutine prob_standard_wateruse(alpha,beta,itr,n_ant,dpts,count_dur,cur_sea)
 
-! Aaron Zecchin, April 2002, modified by Joanna Szemis, October 2010
-! modified by Duc Cong Hiep Nguyen, February 2014
+! Aaron Zecchin, April 2002, modified by Joanna Szemis, October 2010, modified by Duc Cong Hiep Nguyen, October 2012
 ! Determines the probability distribution using generic ACO weighting function
 ! INPUT: alpha, beta, ant-graph[ max_path, path(i)%max_edge, path(i)%edge(j)%eta, path(i)%edge(j)%tau ]
 ! OUTPUT: ant_graph[ path(i)%edge(j)%prob ]
@@ -79,6 +82,7 @@ subroutine prob_standard_wateruse(alpha,beta,itr,n_ant,dpts,count_dur,cur_sea)
     real(8) :: y, tvar
 
 !first two loops to calculate the decision points to choose the water amounts for crops
+! if (tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(r)%prob == 0.0) ....
     do i = 1, n_crop(cur_sea)
         cur_crop = i
         if (seasons(cur_sea)%name_crop(cur_crop) /= "dryland") then
