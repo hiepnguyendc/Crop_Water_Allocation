@@ -42,6 +42,10 @@ subroutine ACO_initialisation
             allocate(ant(i)%tree(l)%season(n_sea))
             do m = 1, n_sea
                 allocate(ant(i)%tree(l)%season(m)%crop(n_crop(m)))
+                allocate(ant(i)%tree(l)%season(m)%max_status(n_crop(m)))
+                ant(i)%tree(l)%season(m)%max_status(:) = 0
+                allocate(ant(i)%tree(l)%season(m)%min_status(n_crop(m)))
+                ant(i)%tree(l)%season(m)%min_status(:) = 0
                 allocate(ant(i)%tree(l)%season(m)%dec_crop(max_path))
                 allocate(ant(i)%tree(l)%season(m)%random_crop(max_path))
                 allocate(ant(i)%tree(l)%season(m)%check_crop(n_crop(m)))
@@ -55,6 +59,8 @@ subroutine ACO_initialisation
                     ant(i)%tree(l)%season(m)%crop(k)%water_use(:) = 0.0
                     allocate(ant(i)%tree(l)%season(m)%crop(k)%area_planted(max_path))
                     ant(i)%tree(l)%season(m)%crop(k)%area_planted(:) = 0.0
+                    ant(i)%tree(l)%season(m)%crop(k)%water_status = 0
+                    allocate(ant(i)%tree(l)%season(m)%crop(k)%dec_water_status(seasons(m)%n_opt_water(k)))
                 end do
             end do
 		end do
@@ -197,9 +203,9 @@ subroutine initialise_ant_graph
                     tree(i)%dec(j)%season(k)%crop(l)%max_opt_water = seasons(k)%n_opt_water(l)
 				    do r=1,seasons(k)%n_opt_water(l)
 					    if (tree(i)%dec(j)%season(k)%crop(l)%opt_water(r)%cost < small_val) then	!Checking to see if cost is equal to zero
-						    tree(i)%dec(j)%season(k)%crop(l)%opt_water(r)%heu = 1.0 		        !if so then a virtual cost is used to determine visability
-					    else																	    !if not the actual option cost is used
-						    tree(i)%dec(j)%season(k)%crop(l)%opt_water(r)%heu = 1.0	
+						    tree(i)%dec(j)%season(k)%crop(l)%opt_water(r)%heu = 1.0         		!if so then a virtual cost is used to determine visability
+					    else																    	!if not the actual option cost is used
+						    tree(i)%dec(j)%season(k)%crop(l)%opt_water(r)%heu = 1.0 	
 					    end if
                     end do
                 end do
@@ -368,7 +374,7 @@ subroutine cost_details
             end do
         end do
     end do
-    
+
 	CLOSE(221)
 	CLOSE(223)
  
