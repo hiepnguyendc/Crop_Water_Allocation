@@ -51,7 +51,7 @@
                         ant(n_ant)%tree(i)%season(p)%crop(:)%water_status = 0
 
                         call check_constraints(n_it,n_ant,i,q,1,p)	            ! check constraints
-
+                        call heuristic_crop(n_it,n_ant,i,q,1,p)
 					    call prob_determination(n_it,aco_type,i,n_ant,q,1,p)	! sets probabilities for ant loop  
 					    ! there are two ways to determine probabilities for ant loop. here is the first one. the second one
 					    ! will calculate for the whole decision tree, meaning this subroutine will be run before this loop.
@@ -59,6 +59,7 @@
                         if (seasons(p)%name_crop(ant(n_ant)%tree(i)%season(p)%dec_crop(q)) /= "dryland") then
                             ant(n_ant)%tree(i)%season(p)%crop(ant(n_ant)%tree(i)%season(p)%dec_crop(q))%dec_water_status(:) = 0
                             call constraints_avai_crop_water (n_it,n_ant,i,q,1,p)
+                            call heuristic_wuse(n_it,n_ant,i,q,1,p)
                             call prob_determination_wateruse(n_it,aco_type,i,n_ant,q,1,p)
                             call path_selection_wateruse(n_it,n_ant,i,q,1,p)                       
                         end if
