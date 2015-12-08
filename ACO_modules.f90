@@ -39,10 +39,10 @@ module ant_graph
     
     integer :: unit_area
     integer, allocatable, dimension(:) :: array_areas		!values of sub-areas
-
+    
     !used to contain the penalty values if the constraints are uncovered
     real(8) :: pen_mincrop, pen_maxcrop, pen_maxsea, pen_wuse    
-    
+
     type sea_details
         !crop production function
 		real(8), allocatable, dimension(:,:) :: aa, bb, cc      !cost
@@ -106,10 +106,15 @@ module ant_colony
         real(8), allocatable, dimension(:) :: area_planted      !area allocated to crop
         real(8) :: max_area                                     !area allocated to crop
         real(8) :: area_accumulated                             !accumulated area of each crop for each tree
+        integer :: water_status                                 !status of water use of each crop
+        integer, allocatable, dimension(:) :: dec_water_status  !status of water use of each water-use option
     end type crop_type
     
     type season_type
         type(crop_type), allocatable, dimension (:) :: crop
+        integer, allocatable, dimension(:) :: max_status    !status of maximum area of each crop
+        integer, allocatable, dimension(:) :: min_status    !status of maximum area of each crop
+        integer :: sea_status                               !status of maximum area in each season
         integer, allocatable, dimension(:) :: dec_crop 		! the array of decisions the ant has selected for crops
 		real(8), allocatable, dimension(:) :: random_crop 	! random number with which the decision was made
         integer, allocatable, dimension(:) :: check_crop    !check a crop is selected or not, to make decision for selecting water
