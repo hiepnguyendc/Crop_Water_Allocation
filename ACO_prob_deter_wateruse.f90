@@ -1,10 +1,10 @@
 !:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 !
 ! CONTAINS:
-! SUBROUTINE prob_determination_wateruse(num_it, aco_type,itr,n_ant,dpts)
-! SUBROUTINE prob_AS_wateruse(itr,n_ant,dpts)
-! SUBROUTINE prob_MMAS_wateruse(itr,n_ant,dpts)
-! SUBROUTINE prob_standard_wateruse(alpha, beta,itr,n_ant,dpts)
+! SUBROUTINE prob_determination(num_it, aco_type,itr,n_ant,dpts)
+! SUBROUTINE prob_AS(itr,n_ant,dpts)
+! SUBROUTINE prob_MMAS(itr,n_ant,dpts)
+! SUBROUTINE prob_standard(alpha, beta,itr,n_ant,dpts)
 !
 !::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: 
    
@@ -19,6 +19,9 @@
     INTEGER :: dum = 1						!Passed into print_prob as this variable location is only used for ACS
     integer :: cur_sea                      !current season
 
+! Determining aco type, note ACS (type 2) is not called as the probability distribution of the ACS changes locally
+
+    if(aco_type==1) call prob_AS_wateruse(itr,n_ant,dpts,count_dur,cur_sea)
     IF(aco_type==5) CALL prob_MMAS_wateruse(itr,n_ant,dpts,count_dur,cur_sea)
 
    end subroutine prob_determination_wateruse
@@ -58,7 +61,7 @@
  
 subroutine prob_standard_wateruse(alpha,beta,itr,n_ant,dpts,count_dur,cur_sea)
 
-! Aaron Zecchin, April 2002, modified by Joanna Szemis, October 2010, modified by Duc Cong Hiep Nguyen, February 2014
+! Aaron Zecchin, April 2002, modified by Joanna Szemis, October 2010, modified by Duc Cong Hiep Nguyen, October 2012
 ! Determines the probability distribution using generic ACO weighting function
 ! INPUT: alpha, beta, ant-graph[ max_path, path(i)%max_edge, path(i)%edge(j)%eta, path(i)%edge(j)%tau ]
 ! OUTPUT: ant_graph[ path(i)%edge(j)%prob ]
@@ -78,9 +81,11 @@ subroutine prob_standard_wateruse(alpha,beta,itr,n_ant,dpts,count_dur,cur_sea)
     real(8) :: y, tvar
 
 !first two loops to calculate the decision points to choose the water amounts for crops
+! if (tree(itr)%dec(dpts)%season(cur_sea)%opt_crop(r)%prob == 0.0) ....
     cur_crop = ant(n_ant)%tree(itr)%season(cur_sea)%dec_crop(dpts)
-    if (seasons(cur_sea)%wuse_crop(cur_crop) == 0.0) then
+    if (seasons(cur_sea)%wuse_crop(cur_crop) < 0.0) then
         if (wbstatus == 0) then
+		    !preliminary weighting/probability calculations
             tot_prob_water = 0.00				
 		    do r = 1,tree(itr)%dec(dpts)%season(cur_sea)%crop(cur_crop)%max_opt_water
                 if (ant(n_ant)%tree(itr)%season(cur_sea)%crop(cur_crop)%dec_water_status(r) == 0) then
@@ -108,6 +113,7 @@ subroutine prob_standard_wateruse(alpha,beta,itr,n_ant,dpts,count_dur,cur_sea)
 		        do r = 1,tree(itr)%dec(dpts)%season(cur_sea)%crop(cur_crop)%max_opt_water
 			        tree(itr)%dec(dpts)%season(cur_sea)%crop(cur_crop)%opt_water(r)%prob=&
                         tree(itr)%dec(dpts)%season(cur_sea)%crop(cur_crop)%opt_water(r)%prob/tot_prob_water
+			        !prob_crop=tree(itr)%dec(dpts)%crop(cur_crop)%opt_water(r)%prob
                 end do
             end if
         else    !if (wbstatus == 1)
