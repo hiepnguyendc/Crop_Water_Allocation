@@ -1,8 +1,8 @@
 !:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 !
 ! CONTAINS:
-! SUBROUTINE path_selection_wateruse(num_it, num_ant,itr,dpts)
-! SUBROUTINE selection_standard_wateruse(num_ant,itr,dpts)
+! SUBROUTINE path_selection(num_it, num_ant,itr,dpts)
+! SUBROUTINE selection_standard(num_ant,itr,dpts)
 !
 !:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::  
   
@@ -18,6 +18,7 @@
    INTEGER :: itr,dpts,count_dur	!current decision tree and decision point
    integer :: cur_sea               !current season
  
+   if(aco_type==1) call selection_standard_wateruse(num_ant,itr,dpts,count_dur,cur_sea)
    iF(aco_type==5) CALL selection_standard_wateruse(num_ant,itr,dpts,count_dur,cur_sea)
  
  end subroutine path_selection_wateruse
@@ -26,12 +27,13 @@
  
  subroutine selection_standard_wateruse(num_ant,itr,dpts,count_dur,cur_sea)
  
- ! Aaron Zecchin, April 2002 modified Joanna Szemis, October 2010, modified by Duc Cong Hiep Nguyen, February 2014
+ ! Aaron Zecchin, April 2002 modified Joanna Szemis, October 2010, modified by Duc Cong Hiep Nguyen, October 2012
  ! determines path that num_ant is to take
  
 	use ant_graph
 	use ant_colony
 	use r_num
+    use qsort_c_module
     use water_model
    
 	real(8) :: sum_prob_water, wuse
@@ -44,7 +46,7 @@
     !  selection of edges
     !*************** SELECTION - CROPS *************************
     cur_crop = ant(num_ant)%tree(itr)%season(cur_sea)%dec_crop(dpts)
-    if (seasons(cur_sea)%wuse_crop(cur_crop) == 0.0) then
+    if (seasons(cur_sea)%wuse_crop(cur_crop) < 0.0) then
         if (wbstatus == 0) then 
             flag = 0
 	        sum_prob_water = 0.00
